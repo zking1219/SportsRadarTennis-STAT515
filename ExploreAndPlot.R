@@ -4,7 +4,8 @@
 #==================================================
 
 # Change this to reflect wherever you've cloned this repo on your machine
-setwd("/Users/zackkingbackup/Documents/Grad Schools/GMU_Masters/STAT515/RedesignProject1/SportsRadarTennis-STAT515")
+#setwd("/Users/zackkingbackup/Documents/Grad Schools/GMU_Masters/STAT515/RedesignProject1/SportsRadarTennis-STAT515")
+setwd("/Users/iaa211/Documents/ContinuedEducation/GMU-Masters/STAT515/Redesign1/SportsRadarTennis-STAT515")
 
 library(tidyverse)
 source('hw.R') # Instructor provided ggplot theme
@@ -26,7 +27,7 @@ bar_tibble2 <- summarySEwithin(bar_tibble1, measurevar="ace_percentage", withinv
 library(ggplot2)
 ggplot(bar_tibble2, aes(x=surface, y=ace_percentage*100, fill=is_winner)) + 
   geom_bar(position=position_dodge(.9), colour="black", stat="identity") +
-  geom_errorbar(position=position_dodge(.9), width=.25, aes(ymin=ace_percentage-ci, ymax=ace_percentage+ci)) + 
+  geom_errorbar(position=position_dodge(.9), width=.25, aes(ymin=100*(ace_percentage-ci), ymax=100*(ace_percentage+ci))) + 
   ggtitle("Novak Djokovic 2019 Ace Percentage 95% CIs") +
   labs(x="Court Surface", y="Ace Percentage") +
   hw
@@ -39,7 +40,7 @@ bar_tibble3$ci = as.numeric(bar_tibble3$ci)
 
 ggplot(bar_tibble3, aes(x=surface, y=ace_percentage*100, fill=is_winner)) + 
   geom_bar(position=position_dodge(.9), colour="black", stat="identity") +
-  geom_errorbar(position=position_dodge(.9), width=.25, aes(ymin=ace_percentage-ci, ymax=ace_percentage+ci)) + 
+  geom_errorbar(position=position_dodge(.9), width=.25, aes(ymin=100*(ace_percentage-ci), ymax=100*(ace_percentage+ci))) + 
   ggtitle("Novak Djokovic 2019 Ace Percentage 95% CIs") +
   labs(x="Court Surface", y="Ace Percentage") +
   hw
@@ -88,7 +89,7 @@ ggplot(tibble2, aes(x=DR,y=ace_percentage*100)) +
   facet_wrap( ~ surface, ncol=3) + 
   coord_cartesian(xlim=c(0, 4)) +
   labs(x="Dominance Rating",y="Ace Percentage") +
-  ggtitle("Novak Djokovic 2019 DR v. Ace percentage")
+  ggtitle("Novak Djokovic 2019 DR v. Ace Percentage")
 
 # Now do it again for first serve pct
 ggplot(tibble2, aes(x=DR,y=first_serve_pct*100)) + 
@@ -115,7 +116,10 @@ ldr_ap_stack <- ggplot(tibble2, aes(x=LDR,y=ace_percentage*100)) +
   hw + #theme(legend.position="none") +
   facet_wrap( ~ surface, ncol=3) +
   labs(x="",y="Ace %") + 
-  ggtitle("Novak Djokovic 2019 Matches")
+  ggtitle("Novak Djokovic 2019 Matches") +
+  theme(axis.title.x = element_blank(), axis.text.x = element_blank(), 
+        axis.ticks.x = element_blank(), legend.position = "none",
+        axis.title.y = element_text(angle = 0))
 
 ldr_ap <- ldr_ap_stack + 
   labs(x="ln(Dominance Rating)",y="Ace Percentage") +
@@ -130,7 +134,11 @@ ldr_fsp_stack <- ggplot(tibble2, aes(x=LDR,y=first_serve_pct*100)) +
   hw +
   facet_wrap( ~ surface, ncol=3) + 
   coord_cartesian(ylim=c(0, 100)) +
-  labs(x="",y="First Serve %")
+  labs(x="",y="First Serve %") +
+  theme(axis.title.x = element_blank(), axis.text.x = element_blank(), 
+        axis.ticks.x = element_blank(), strip.background = element_blank(),
+        strip.text.x = element_blank(), legend.position = "none",
+        axis.title.y = element_text(angle = 0)) 
 
 ldr_fsp <- ldr_fsp_stack +
   labs(x="ln(Dominance Rating)",y="First Serve Percentage") +
@@ -143,7 +151,10 @@ ldr_dfp_stack <- ggplot(tibble2, aes(x=LDR,y=double_fault_percentage*100)) +
   geom_point(aes(colour=match_result)) +
   hw +# theme(legend.position="none") +
   facet_wrap( ~ surface, ncol=3) +
-  labs(x="ln(Dominance Rating)",y="Double Fault %")
+  labs(x="ln(Dominance Rating)",y="Double Fault %") +
+  theme(strip.background = element_blank(),
+  strip.text.x = element_blank(), legend.position = "bottom",
+  legend.title = element_blank(), axis.title.y = element_text(angle = 0))
   
 ldr_dfp <- ldr_dfp_stack + 
   labs(x="ln(Dominance Rating)",y="Double Fault Percentage") +
@@ -163,4 +174,121 @@ grid.draw(rbind(ggplotGrob(ldr_ap_stack), ggplotGrob(ldr_fsp_stack),
 
 # Try ggarrange to fix this nonsense
 # http://www.sthda.com/english/articles/24-ggpubr-publication-ready-plots/81-ggplot2-easy-way-to-mix-multiple-graphs-on-the-same-page/
+
+# ln(DR) v. First Serve Win %
+ldr_fswp_stack <- ggplot(tibble2, aes(x=LDR,y=first_serve_points_won_pct*100)) + 
+  geom_point(aes(colour=match_result)) +
+  hw +
+  facet_wrap( ~ surface, ncol=3) + 
+  coord_cartesian(ylim=c(0, 100)) +
+  labs(x="",y="First Serve\nPoints Won %") +
+  theme(axis.title.x = element_blank(), axis.text.x = element_blank(), 
+        axis.ticks.x = element_blank(), strip.background = element_blank(),
+        strip.text.x = element_blank(), legend.position = "none",
+        axis.title.y = element_text(angle = 0)) 
+
+# ln(DR) v. Second Serve Win %
+ldr_sswp_stack <- ggplot(tibble2, aes(x=LDR,y=second_serve_points_won_pct*100)) + 
+  geom_point(aes(colour=match_result)) +
+  hw +
+  facet_wrap( ~ surface, ncol=3) + 
+  coord_cartesian(ylim=c(0, 100)) +
+  labs(x="",y="Second Serve\nPoints Won %") +
+  theme(axis.title.x = element_blank(), axis.text.x = element_blank(), 
+        axis.ticks.x = element_blank(), strip.background = element_blank(),
+        strip.text.x = element_blank(), legend.position = "none",
+        axis.title.y = element_text(angle = 0)) 
+
+grid.newpage()
+grid.draw(rbind(ggplotGrob(ldr_ap_stack), ggplotGrob(ldr_fsp_stack),
+                ggplotGrob(ldr_fswp_stack), ggplotGrob(ldr_sswp_stack),
+                ggplotGrob(ldr_dfp_stack),
+                size = "last"))
+
+# I want a splom showing distributions of my variables
+offDiag <- function(x,y,...){
+  panel.grid(h=-1,v=-1,...)
+  panel.hexbinplot(x,y,xbins=15,...,border=gray(.7),
+                   trans=function(x)x^.5)
+  panel.loess(x , y, ..., lwd=2,col='red')
+}
+onDiag <- 
+  function(x, ...){
+    yrng <- current.panel.limits()$ylim
+    d <- density(x, na.rm=TRUE)
+    d$y <- with(d, yrng[1] + 0.95 * diff(yrng) * y / max(y) )
+    panel.lines(d,col=rgb(.83,.66,1),lwd=2)
+    diag.panel.splom(x, ...)
+  }
+#install.packages("ellipse")
+library(lattice)
+library(hexbin)
+quartz(width=9,height=9) 
+splom(tibble2[,6:10], type=c("g","p"),as.matrix=TRUE,
+      varnames=c("Double\nFault %",
+                 "Ace %",
+                 "1st Serve\npts won %",
+                 "2nd Serve\npts won %",
+                 "1st Serve %"),
+      xlab='',
+      # main=paste("Iris Data:  Green=Setosa, ",  
+      #            "Red=Versicolor, Cyan=Virginica",sep=""),
+      pscale=3, varname.cex=0.8,axis.text.cex=0.65,
+      axis.text.col="purple",axis.text.font=2,
+      axis.line.tck=.5, pch=21,
+      col="black",lwd=3
+)
+
+quartz(width=9,height=9) 
+splom(tibble2[,c(6:10,12)], as.matrix = TRUE,
+      xlab = '',main = "Djokovic 2019 Data ",
+      varnames=c("Double\nFault %",
+                 "Ace %",
+                 "1st Serve\npts won %",
+                 "2nd Serve\npts won %",
+                 "1st Serve %",
+                 "Dominance\nRating (DR)"),
+      pscale = 0, varname.col = "red",
+      varname.cex = 0.56, varname.font = 2,
+      axis.text.cex = 0.4, axis.text.col = "red",
+      axis.text.font = 2, axis.line.tck = .5,
+      panel = function(x,y,...) {
+        panel.grid(h = -1,v = -1,...)
+        panel.hexbinplot(x,y,xbins = 12,...,
+                         border = gray(.7),
+                         trans = function(x)x^1)
+        panel.loess(x , y, ...,
+                    lwd = 2,col = 'purple')
+      },
+      diag.panel = function(x, ...){
+        yrng <- current.panel.limits()$ylim
+        d <- density(x, na.rm = TRUE)
+        d$y <- with(d, yrng[1] + 0.95 * diff(yrng) * y / max(y) )
+        panel.lines(d,col = gray(.8),lwd = 2)
+        diag.panel.splom(x, ...)
+      }
+)
+
+# I want a bubble chart that uses Ace % for the size and plots DR v. 1st Serve %
+ggplot(tibble2, aes(x=LDR,y=first_serve_pct*100,size=ace_percentage*100,fill=match_result)) + 
+  geom_point(alpha=0.5, shape=21) +
+  hw + 
+  facet_wrap( ~ surface, ncol=3) + 
+  labs(x="ln(Dominance Rating)",y="First Serve Percentage") +
+  coord_cartesian(ylim=c(0, 100)) +
+  ggtitle("Novak Djokovic 2019 ln(DR) v. First Serve Percentage")
+  #theme(legend.title = element_blank()
+
+# Bubble chart for First Serve % v. First Serve % points won w/ LDR as bubble size
+quartz(width=9,height=6)
+ggplot(tibble2, aes(x=first_serve_points_won_pct*100,y=first_serve_pct*100,size=LDR,fill=match_result)) + 
+  geom_point(alpha=0.5, shape=21) +
+  hw + 
+  facet_wrap( ~ surface, ncol=3) + 
+  labs(x="Percent First Serve Points Won",y="First Serve Percentage") +
+  coord_cartesian(ylim=c(0, 100),xlim=c(0,100)) +
+  ggtitle("Novak Djokovic 2019 Percentage First Serve Points Won\nv. First Serve Percentage") +
+  theme(legend.title = element_blank())
+
+lnDRmod <- lm(LDR ~ . , data=tibble2[,c(6:10,14)] )
 
